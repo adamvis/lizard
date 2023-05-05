@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 import torch
-from transformers import TextGenerationPipeline, TrainingArguments, Trainer
+from src.lizard.llm import TextGenerationPipeline, TrainingArguments, Trainer
 
 from .base.datasets import TextDataset
 from .base.const import models

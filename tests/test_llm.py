@@ -1,5 +1,5 @@
 import unittest
-from src.lizard.transformers import LLM
+from src.lizard.llm import LLM
 
 
 class TestLLM(unittest.TestCase):
