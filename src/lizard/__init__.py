@@ -1,2 +1,2 @@
-from llm import LLM
-from base import TextDataset
+from .llm import LLM
+from .base import TextDataset

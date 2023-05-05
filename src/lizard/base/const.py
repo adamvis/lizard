@@ -1,24 +1,24 @@
-import src.lizard.llm as llm
+import transformers
 
 models = {
     "gpt2": {
-        "tokenizer": llm.GPT2Tokenizer,
-        "model": llm.GPT2LMHeadModel,
-        "config": llm.GPT2Config,
+        "tokenizer": transformers.GPT2Tokenizer,
+        "model": transformers.GPT2LMHeadModel,
+        "config": transformers.GPT2Config,
     },
     "gpt2-medium": {
-        "tokenizer": llm.GPT2Tokenizer,
-        "model": llm.GPT2LMHeadModel,
-        "config": llm.GPT2Config,
+        "tokenizer": transformers.GPT2Tokenizer,
+        "model": transformers.GPT2LMHeadModel,
+        "config": transformers.GPT2Config,
     },
     "gpt2-large": {
-        "tokenizer": llm.GPT2Tokenizer,
-        "model": llm.GPT2LMHeadModel,
-        "config": llm.GPT2Config,
+        "tokenizer": transformers.GPT2Tokenizer,
+        "model": transformers.GPT2LMHeadModel,
+        "config": transformers.GPT2Config,
     },
     "gpt2-xl": {
-        "tokenizer": llm.GPT2Tokenizer,
-        "model": llm.GPT2LMHeadModel,
-        "config": llm.GPT2Config,
+        "tokenizer": transformers.GPT2Tokenizer,
+        "model": transformers.GPT2LMHeadModel,
+        "config": transformers.GPT2Config,
     },
 }
