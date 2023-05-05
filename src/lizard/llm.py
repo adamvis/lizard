@@ -48,10 +48,6 @@ class LLM(BaseEstimator, TransformerMixin):
     def transform(self, X):
         text_gen_pipeline = TextGenerationPipeline(model=self.model, tokenizer=self.tokenizer)
         generated_texts = text_gen_pipeline(X, max_length=self.config.n_positions)
+        result = np.array([text[0]["generated_text"] for text in generated_texts])
 
-        if type(generated_texts) is not str:
-            result = [text["generated_text"] for text in generated_texts]
-        else:
-            result = generated_texts
-            
         return result
