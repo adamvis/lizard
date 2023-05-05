@@ -2,8 +2,8 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from transformers import TextGenerationPipeline, TrainingArguments, Trainer
 
-from .base.datasets import TextDataset
-from .base.const import models
+from base.datasets import TextDataset
+from base.const import models
 
 
 class LLM(BaseEstimator, TransformerMixin):
@@ -49,5 +49,9 @@ class LLM(BaseEstimator, TransformerMixin):
         text_gen_pipeline = TextGenerationPipeline(model=self.model, tokenizer=self.tokenizer)
         generated_texts = text_gen_pipeline(X, max_length=self.config.n_positions)
 
-        return [text["generated_text"] for text in generated_texts]
-
+        if type(generated_texts) is not str:
+            result = [text["generated_text"] for text in generated_texts]
+        else:
+            result = generated_texts
+            
+        return result
