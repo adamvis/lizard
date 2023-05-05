@@ -1,5 +1,7 @@
+import time
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+import torch
 from transformers import TextGenerationPipeline, TrainingArguments, Trainer
 
 from base.datasets import TextDataset
@@ -14,6 +16,7 @@ class LLM(BaseEstimator, TransformerMixin):
         self.tokenizer = models[model_name]["tokenizer"].from_pretrained(model_name)
         self.config = models[model_name]["config"].from_pretrained(model_name)
         self.model = models[model_name]["model"].from_pretrained(model_name, config=self.config)
+        self.inmemory_file = io.StringIO()
 
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -49,5 +52,39 @@ class LLM(BaseEstimator, TransformerMixin):
         text_gen_pipeline = TextGenerationPipeline(model=self.model, tokenizer=self.tokenizer)
         generated_texts = text_gen_pipeline(X, max_length=self.config.n_positions)
         result = np.array([text[0]["generated_text"] for text in generated_texts])
-
         return result
+
+
+    def transform_one_by_one(self, input_text):
+        def generate_token(model, input_ids, past=None):
+            with torch.no_grad():
+                outputs = model(input_ids=input_ids, past_key_values=past)
+            return outputs
+
+        self.model.eval()
+        input_ids = self.tokenizer.encode(input_text, return_tensors="pt")
+        past_key_values = None
+        max_length = self.config.n_positions
+
+        for _ in range(max_length):
+            outputs = generate_token(self.model, input_ids, past=past_key_values)
+            logits = outputs.logits[:, -1, :]
+            past_key_values = outputs.past_key_values
+            token = torch.multinomial(torch.softmax(logits, dim=-1), num_samples=1).squeeze()
+            input_ids = token.unsqueeze(0).unsqueeze(0)
+
+            # Update the internal result variable
+            self.inmemory_file.write(self.tokenizer.decode([token.item()], clean_up_tokenization_spaces=False))
+
+            if token.item() == self.tokenizer.eos_token_id:
+                break
+
+    def poll_result(self, interval=0.5):
+        prev_position = 0
+        while True:
+            self.inmemory_file.seek(prev_position)
+            new_data = self.inmemory_file.read()
+            if new_data:
+                print(new_data, end="")
+                prev_position = self.inmemory_file.tell()
+            time.sleep(interval)
